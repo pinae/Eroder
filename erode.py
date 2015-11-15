@@ -6,7 +6,7 @@ neighbours = [(-1, -1), (0, -1), (1, -1), (1, 0),
               (1, 1), (0, 1), (-1, 1), (-1, 0)]
 
 
-def single_drop(x, y, height_map, amount_map):
+def single_drop(x, y, height_map, amount_map, sediment=0.0):
     height = height_map[x, y, 0]
     min_n = (0, 0)
     min_n_h = height
@@ -23,14 +23,13 @@ def single_drop(x, y, height_map, amount_map):
         amount = max(0.3, amount_map[x, y])
         amount_map[x, y] = amount
         steepness = height - height_map[x + min_n[0], y + min_n[1], 0]
-        height_map[x, y, 0] = max(height_map[x, y, 0] -
-                                  amount * min(0.05, steepness),
-                                  0.0)
+        material = amount * min(0.05, steepness) - sediment
+        height_map[x, y, 0] = max(height_map[x, y, 0] - material, 0.0)
         height_map[x, y, 1] = height_map[x, y, 0]
         height_map[x, y, 2] = height_map[x, y, 0]
         if amount_map[x + min_n[0], y + min_n[1]] == 0:
             single_drop(x + min_n[0], y + min_n[1],
-                        height_map, amount_map)
+                        height_map, amount_map, max(0, material))
     return height_map, amount_map
 
 
